@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "3000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_PASSWORD: wordpress
+    volumes:
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      # Change the theme name below
+      - ./wp-content/themes/custom-theme:/var/www/html/wp-content/themes/custom-theme # mapping our custom theme to the container
+      - ./wp-content/plugins:/var/www/html/wp-content/plugins # map our plugins to the container
+      - ./wp-content/uploads:/var/www/html/wp-content/uploads # map our uploads to the container
+
+volumes:
+  db_data:
